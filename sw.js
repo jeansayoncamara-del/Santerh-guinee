@@ -1,7 +1,6 @@
 const CACHE_NAME = "santerh-guinee-v1";
-const ASSETS = [
-  "./",
-  "./index.html",
+const ASSETS_TO_CACHE = [
+  "./SanteRH-Guinee.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
@@ -9,7 +8,7 @@ const ASSETS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
   self.skipWaiting();
 });
@@ -17,23 +16,26 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      )
     )
   );
   self.clients.claim();
 });
 
+// Stratégie : réseau d'abord (données Firebase à jour), secours sur le cache si hors-ligne
 self.addEventListener("fetch", (event) => {
-  // Réseau d'abord, secours sur le cache (utile pour Firebase qui doit rester en direct)
+  const req = event.request;
+  if (req.method !== "GET") return;
+
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          if (event.request.method === "GET") cache.put(event.request, clone);
-        });
-        return response;
+    fetch(req)
+      .then((res) => {
+        const resClone = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+        return res;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(req).then((cached) => cached || caches.match("./SanteRH-Guinee.html")))
   );
 });

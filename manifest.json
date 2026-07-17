@@ -1,13 +1,14 @@
 {
   "name": "SantéRH Guinée",
   "short_name": "SantéRH",
-  "description": "Gestion moderne et efficace du personnel de santé, à l'échelle du district.",
-  "start_url": "./index.html",
+  "description": "Gestion RH du personnel de santé — pointage QR, activités, congés, mérite.",
+  "start_url": "./SanteRH-Guinee.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F4F6F5",
-  "theme_color": "#1E7C3C",
   "orientation": "portrait",
+  "background_color": "#F4F6F5",
+  "theme_color": "#155A2C",
+  "lang": "fr",
   "icons": [
     {
       "src": "icon-192.png",
